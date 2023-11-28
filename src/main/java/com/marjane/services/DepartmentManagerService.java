@@ -5,31 +5,55 @@ import com.marjane.dtos.PromotionDTO;
 import com.marjane.enumeration.PromotionStatus;
 import com.marjane.models.DepartmentManager;
 import com.marjane.models.Promotion;
+import com.marjane.observer.PromotionObservable;
+import com.marjane.observer.PromotionObserver;
 import com.marjane.repositories.DepartmentManagerRepository;
 import com.marjane.repositories.PromotionRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class DepartmentManagerService {
+public class DepartmentManagerService implements PromotionObservable {
 
     private final DepartmentManagerRepository departmentManagerRepository;
     private final PromotionRepository promotionRepository;
-
+    private final List<PromotionObserver> observers = new ArrayList<>();
     private final ModelMapper modelMapper;
-
-    @Autowired
-    public DepartmentManagerService(DepartmentManagerRepository departmentManagerRepository, PromotionRepository promotionRepository, ModelMapper modelMapper) {
+     @Autowired
+    public DepartmentManagerService(
+            DepartmentManagerRepository departmentManagerRepository,
+            PromotionRepository promotionRepository,
+            ModelMapper modelMapper
+    ) {
         this.departmentManagerRepository = departmentManagerRepository;
         this.promotionRepository = promotionRepository;
         this.modelMapper = modelMapper;
     }
 
+    @Override
+    public void addObserver(PromotionObserver observer) {
+        observers.add(observer);
+    }
+
+    @Override
+    public void removeObserver(PromotionObserver observer) {
+        observers.remove(observer);
+    }
+
+    @Override
+    public void notifyObservers(PromotionDTO promotionDTO) {
+        for (PromotionObserver observer : observers) {
+            System.out.println("Notification sent to Center Admin: Promotion status changed to " + promotionDTO.getStatus());
+            observer.onPromotionStatusChange(promotionDTO);
+        }
+    }
     public DepartmentManagerDTO addDepartmentManager(DepartmentManagerDTO departmentManagerDTO) {
         DepartmentManager departmentManager = modelMapper.map(departmentManagerDTO, DepartmentManager.class);
         DepartmentManager savedDepartmentManager = departmentManagerRepository.save(departmentManager);
@@ -79,7 +103,15 @@ public class DepartmentManagerService {
 
         Promotion savedPromotion = promotionRepository.save(promotion);
 
-        return modelMapper.map(savedPromotion, PromotionDTO.class);
+        PromotionDTO updatedPromotionDTO = modelMapper.map(savedPromotion, PromotionDTO.class);
+
+         notifyObservers(updatedPromotionDTO);
+
+        return updatedPromotionDTO;
     }
+
+
+
+
 
 }

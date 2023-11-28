@@ -4,6 +4,7 @@ import com.marjane.enumeration.PromotionStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import java.util.Date;
 
@@ -12,7 +13,7 @@ import java.util.Date;
 @Table(name = "promotions")
 @NoArgsConstructor
 @AllArgsConstructor
-public class Promotion {
+ public class Promotion {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,5 +39,7 @@ public class Promotion {
 
     @Enumerated(EnumType.STRING)
     private PromotionStatus status;
+
+
 
  }

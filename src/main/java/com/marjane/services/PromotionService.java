@@ -1,6 +1,7 @@
 package com.marjane.services;
 
 import com.marjane.dtos.PromotionDTO;
+import com.marjane.enumeration.PromotionStatus;
 import com.marjane.models.Promotion;
 import com.marjane.repositories.CategoryRepository;
 import com.marjane.repositories.ProductRepository;
@@ -29,9 +30,13 @@ public class PromotionService {
     }
 
     public PromotionDTO addPromotion(PromotionDTO promotionDTO) {
-        Promotion promotion = mapPromotionDTOToEntity(promotionDTO);
-        Promotion savedPromotion = promotionRepository.save(promotion);
-        return mapPromotionEntityToDTO(savedPromotion);
+         Promotion promotion = mapPromotionDTOToEntity(promotionDTO);
+
+         promotion.setStatus(PromotionStatus.PENDING);
+
+         Promotion savedPromotion = promotionRepository.save(promotion);
+
+         return mapPromotionEntityToDTO(savedPromotion);
     }
 
     public List<PromotionDTO> getAllPromotions() {

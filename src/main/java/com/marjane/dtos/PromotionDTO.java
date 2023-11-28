@@ -1,10 +1,12 @@
 package com.marjane.dtos;
 
+import com.marjane.enumeration.PromotionStatus;
 import lombok.Data;
+
 import java.util.Date;
 
 @Data
-public class PromotionDTO {
+ public class PromotionDTO {
     private Long id;
     private Long categoryId;
     private double discountPercentage;
@@ -12,5 +14,6 @@ public class PromotionDTO {
     private Date validFrom;
     private Date validTo;
     private Long productId;
-    // Other relevant fields
+    private PromotionStatus status;
+
 }

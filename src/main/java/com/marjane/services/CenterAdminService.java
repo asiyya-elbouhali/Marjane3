@@ -1,8 +1,10 @@
 package com.marjane.services;
 
 import com.marjane.dtos.CenterAdminDTO;
+import com.marjane.dtos.PromotionDTO;
 import com.marjane.models.Center;
 import com.marjane.models.CenterAdmin;
+import com.marjane.observer.PromotionObserver;
 import com.marjane.repositories.CenterAdminRepository;
 import com.marjane.repositories.CenterRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,18 +13,22 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
-public class CenterAdminService {
+public class CenterAdminService implements PromotionObserver {
 
     private final CenterAdminRepository centerAdminRepository;
     private final CenterRepository centerRepository;
 
     @Autowired
     public CenterAdminService(CenterAdminRepository centerAdminRepository,
-                              CenterRepository centerRepository) {
+                              CenterRepository centerRepository
+                               ) {
         this.centerAdminRepository = centerAdminRepository;
         this.centerRepository = centerRepository;
-    }
-
+     }
+    @Override
+    public void onPromotionStatusChange(PromotionDTO promotion) {
+         System.out.println("Notification sent to Center Admin: Promotion status changed");
+     }
     public CenterAdminDTO addCenterAdmin(CenterAdminDTO centerAdminDTO) {
         CenterAdmin centerAdmin = mapCenterAdminDTOToEntity(centerAdminDTO);
 
@@ -57,4 +63,6 @@ public class CenterAdminService {
 
         return centerAdminDTO;
     }
+
+
 }
