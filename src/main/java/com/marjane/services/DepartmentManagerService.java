@@ -3,10 +3,12 @@ package com.marjane.services;
 import com.marjane.dtos.DepartmentManagerDTO;
 import com.marjane.dtos.PromotionDTO;
 import com.marjane.enumeration.PromotionStatus;
+import com.marjane.models.CenterAdmin;
 import com.marjane.models.DepartmentManager;
 import com.marjane.models.Promotion;
 import com.marjane.observer.PromotionObservable;
 import com.marjane.observer.PromotionObserver;
+import com.marjane.repositories.CenterAdminRepository;
 import com.marjane.repositories.DepartmentManagerRepository;
 import com.marjane.repositories.PromotionRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -24,34 +26,34 @@ public class DepartmentManagerService implements PromotionObservable {
 
     private final DepartmentManagerRepository departmentManagerRepository;
     private final PromotionRepository promotionRepository;
-    private final List<PromotionObserver> observers = new ArrayList<>();
+    private List<CenterAdmin> observers = new ArrayList<>();
+
+    private final CenterAdminService centerAdminService;
+
+    private final CenterAdminRepository centerAdminRepository ;
     private final ModelMapper modelMapper;
      @Autowired
     public DepartmentManagerService(
-            DepartmentManagerRepository departmentManagerRepository,
-            PromotionRepository promotionRepository,
-            ModelMapper modelMapper
+             DepartmentManagerRepository departmentManagerRepository,
+             PromotionRepository promotionRepository,
+             CenterAdminService centerAdminService, CenterAdminRepository centerAdminRepository, ModelMapper modelMapper
     ) {
         this.departmentManagerRepository = departmentManagerRepository;
         this.promotionRepository = promotionRepository;
-        this.modelMapper = modelMapper;
+         this.centerAdminService = centerAdminService;
+         this.centerAdminRepository = centerAdminRepository;
+
+         this.modelMapper = modelMapper;
     }
 
-    @Override
-    public void addObserver(PromotionObserver observer) {
-        observers.add(observer);
-    }
-
-    @Override
-    public void removeObserver(PromotionObserver observer) {
-        observers.remove(observer);
-    }
 
     @Override
     public void notifyObservers(PromotionDTO promotionDTO) {
-        for (PromotionObserver observer : observers) {
+         observers = centerAdminRepository.findAll();
+        for (CenterAdmin observer : observers) {
             System.out.println("Notification sent to Center Admin: Promotion status changed to " + promotionDTO.getStatus());
-            observer.onPromotionStatusChange(promotionDTO);
+            //observeCe.onPromotionStatusChange(promotionDTO);
+            centerAdminService.onPromotionStatusChange(promotionDTO);
         }
     }
     public DepartmentManagerDTO addDepartmentManager(DepartmentManagerDTO departmentManagerDTO) {
